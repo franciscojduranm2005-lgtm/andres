@@ -129,17 +129,32 @@
   <section class="hero-banner mb-8 relative group shadow-2xl">
     <img id="hero-img" src="https://placehold.co/1200x420/0056b3/ffffff?text=" alt="Hero banner">
     <div class="absolute inset-0 hero-overlay flex items-center justify-end p-8 md:p-16">
-      <div class="max-w-xl text-right animate-in slide-in-from-right duration-700">
-        <h1 id="hero-titulo" class="text-white text-4xl md:text-6xl font-extrabold leading-[1.1] mb-6 drop-shadow-xl tracking-tight">
+      <div class="max-w-xl text-right animate-in slide-in-from-right duration-700 flex flex-col items-end gap-6">
+        <h1 id="hero-titulo" class="text-white text-4xl md:text-6xl font-extrabold leading-[1.1] drop-shadow-xl tracking-tight">
           Las mejores ofertas <br><span class="text-white opacity-90">en tecnología</span>
         </h1>
+        <div class="hero-btn-wrap">
+          <button class="btn-hero">
+            Vendemos soluciones
+            <svg class="w-5 h-5 ml-1" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 8l4 4m0 0l-4 4m4-4H3"/></svg>
+          </button>
+        </div>
       </div>
     </div>
-    <div class="absolute bottom-4 right-4 md:bottom-6 md:right-8 z-10 text-right">
-      <button class="btn-hero">
-        Vendemos soluciones
-        <svg class="w-5 h-5 ml-1" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 8l4 4m0 0l-4 4m4-4H3"/></svg>
-      </button>
+  </section>
+  
+  <!-- Info Banner for Mobile (Visible instead of sidebar on small screens) -->
+  <section class="lg:hidden mb-8">
+    <div class="promo-mobile flex flex-col items-center text-center p-5 rounded-xl shadow-lg">
+      <div class="flex items-center gap-3 mb-2">
+        <span class="text-3xl">🏠</span>
+        <h3 class="font-bold text-lg text-white">Tienda Física y Online</h3>
+      </div>
+      <p class="text-sm text-white/90 leading-snug max-w-sm">
+        Visítanos en el centro de Barquisimeto: <br>
+        <span class="font-semibold">Carrera 19 entre calles 28 y 29, Bequito local 299.</span><br>
+        ¡Contamos con delivery gratis al centro! 🚚
+      </p>
     </div>
   </section>
 
