@@ -11,6 +11,9 @@ let   currentCategory  = '';
 let   currentSearch    = '';
 let   isLoading        = false;
 let   hasMore          = true;
+const CACHE_KEY        = 'store_cache_products';
+const CACHE_CONFIG_KEY = 'store_cache_config';
+const CACHE_TTL        = 1000 * 60 * 30; // 30 minutes
 
 // ── DOM refs ─────────────────────────────────────────────────
 const grid       = document.getElementById('product-grid');
@@ -21,6 +24,7 @@ const catNav     = document.getElementById('cat-nav');
 
 // ── Init ─────────────────────────────────────────────────────
 (async function init() {
+  loadFromCache(); // Try to show something instantly
   await loadConfig();
   await loadCategories();
   setupSearch();
@@ -31,11 +35,40 @@ const catNav     = document.getElementById('cat-nav');
   renderCartItems();
 })();
 
+function loadFromCache() {
+  try {
+    const config = JSON.parse(localStorage.getItem(CACHE_CONFIG_KEY));
+    if (config) {
+      applyConfig(config.banners);
+      // applyCategories(config.categories); // Wait for loadCategories to do this cleanly
+    }
+    const products = JSON.parse(localStorage.getItem(CACHE_KEY));
+    if (products && Array.isArray(products)) {
+      renderProducts(products, true); // true = append
+    }
+  } catch (e) {
+    console.warn("Cache load failed", e);
+  }
+}
+
+function saveToCache(key, data) {
+  try {
+    localStorage.setItem(key, JSON.stringify(data));
+  } catch (e) {
+    console.warn("Cache save failed", e);
+  }
+}
+
 // ── Config (hero + sidebar) ────────────────────────────────
 async function loadConfig() {
   const { data } = await supabase.from(TABLES.banners).select('*');
   if (!data || data.length === 0) return;
-  
+  saveToCache(CACHE_CONFIG_KEY, { banners: data, timestamp: Date.now() });
+  applyConfig(data);
+}
+
+function applyConfig(data) {
+  if (!data || !data.length) return;
   // Asumiendo que el ID 1 es el Hero y el ID 2 es el Sidebar (ajustar según sea necesario)
   const heroData = data[0];
   const sideData = data[1] || data[0];
@@ -44,7 +77,6 @@ async function loadConfig() {
   const heroTxt  = document.getElementById('hero-titulo');
   const sideImg  = document.getElementById('sidebar-img');
   const sideTxt  = document.getElementById('sidebar-titulo');
-  const promoBnr = document.getElementById('promo-banner');
 
   if (heroImg && heroData) { 
     heroImg.src = heroData.imagen_url || 'https://i.ibb.co/vzR0yvRW/tech-banner.png'; // Fallback to a high-quality tech banner
@@ -52,8 +84,6 @@ async function loadConfig() {
   }
   if (heroTxt && heroData) heroTxt.innerHTML = heroData.titulo;
   if (sideImg && sideData) sideImg.src = sideData.imagen_url;
-  // El texto del sidebar ahora es estático desde el HTML, no lo sobreescribimos
-  // if (sideTxt && sideData) sideTxt.textContent = sideData.titulo;
 }
 
 // ── Categories ─────────────────────────────────────────────
@@ -133,6 +163,11 @@ async function fetchProducts(reset = false) {
 
   if (error) { console.error(error); showSpinner(false); isLoading = false; return; }
 
+  if (reset) {
+    saveToCache(CACHE_KEY, data);
+    grid.innerHTML = ''; // Clear cached products before rendering new ones
+  }
+  
   renderProducts(data || []);
   currentPage++;
   hasMore = from + PAGE_SIZE < (count || 0);
