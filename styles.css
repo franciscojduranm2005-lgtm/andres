@@ -276,6 +276,19 @@ body {
   background: #ff1a1a;
 }
 
+.hero-btn-wrap {
+  position: absolute;
+  bottom: 32px;
+  right: 32px;
+  z-index: 20;
+}
+@media (max-width: 768px) {
+  .hero-btn-wrap {
+    position: static;
+    margin-top: 2rem;
+  }
+}
+
 /* ── Sidebar promo ──────────────────────────────────────── */
 .promo-sidebar {
   position: sticky;
@@ -290,6 +303,11 @@ body {
   width: 100%;
   object-fit: cover;
   border-radius: 12px;
+}
+
+.promo-mobile {
+  background: linear-gradient(135deg, var(--brand-red) 0%, #a80000 100%);
+  color: #fff;
 }
 
 /* ── Nav pills ──────────────────────────────────────────── */
@@ -404,9 +422,10 @@ body {
 @media (max-width: 768px) {
   header .max-w-7xl { flex-wrap: wrap; justify-content: space-between; gap: 8px; }
   .search-bar { order: 10; width: 100%; max-width: none; margin-top: 4px; }
-  .hero-banner { border-radius: 0; margin-left: -1rem; margin-right: -1rem; }
-  .hero-overlay { padding: 2rem 1.5rem; justify-content: center; text-align: center; }
-  #hero-titulo { font-size: 1.75rem !important; text-align: center; }
+  .hero-banner { min-height: 280px; border-radius: 0; margin-left: -1rem; margin-right: -1rem; display: flex; align-items: stretch; position: relative; }
+  .hero-overlay { padding: 1.5rem 1rem !important; justify-content: center !important; text-align: center !important; flex-direction: column !important; width: 100%; position: absolute; inset: 0; display: flex !important; align-items: center !important; }
+  #hero-titulo { font-size: 1.6rem !important; text-align: center !important; margin-bottom: 0 !important; text-shadow: 1px 1px 1px rgba(0,0,0,0.3); }
+  .hero-overlay .flex-col { align-items: center !important; gap: 0 !important; }
   .btn-hero { padding: 10px 20px; font-size: 0.875rem; }
   
   .product-card .card-body { padding: 8px; gap: 4px; }
