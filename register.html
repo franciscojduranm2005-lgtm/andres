@@ -1,0 +1,123 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Crear Cuenta — CONECTADOS EXPRESS</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <link rel="stylesheet" href="css/styles.css">
+</head>
+<body class="min-h-screen flex items-center justify-center bg-gradient-to-br from-[#0d1b2a] via-[#0056b3] to-[#003880]">
+
+<div class="w-full max-w-md mx-4">
+  <div class="bg-white rounded-2xl shadow-2xl overflow-hidden">
+
+    <!-- Header -->
+    <div class="bg-[#0056b3] px-8 py-8 text-center">
+      <img src="imagen_12.jpeg" alt="Logo" class="h-14 mx-auto mb-4 object-contain"
+           onerror="this.outerHTML='<p class=\'text-white font-extrabold text-2xl\'>⚡ CONECTADOS</p>'">
+      <h1 class="text-white text-xl font-bold">Crear nueva cuenta</h1>
+      <p class="text-white/70 text-sm mt-1">Regístrate para acceder al panel</p>
+    </div>
+
+    <!-- Form -->
+    <form id="register-form" class="px-8 py-8 space-y-5">
+      <div>
+        <label class="form-label" for="email">Usuario o Correo</label>
+        <input id="email" name="email" type="text" required class="form-input" placeholder="Ej: juanperez123">
+      </div>
+      <div>
+        <label class="form-label" for="password">Contraseña</label>
+        <div class="relative">
+          <input id="password" name="password" type="password" required class="form-input pr-10" placeholder="••••••••" minlength="6">
+          <button type="button" id="toggle-pw"
+                  class="absolute right-3 top-1/2 -translate-y-1/2 text-gray-400 hover:text-gray-600">
+            <svg class="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"/>
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z"/>
+            </svg>
+          </button>
+        </div>
+        <p class="text-xs text-gray-400 mt-1">Mínimo 6 caracteres.</p>
+      </div>
+
+      <button id="register-btn" type="submit" class="btn-blue w-full justify-center py-3 text-base">
+        Registrarse
+      </button>
+
+      <p id="register-message" class="text-center text-sm hidden"></p>
+
+      <p class="text-center text-sm text-gray-500">
+        ¿Ya tienes cuenta? <a href="login.html" class="text-brand-blue hover:underline font-medium">Inicia sesión</a>
+      </p>
+      <p class="text-center text-sm text-gray-500">
+        <a href="index.html" class="text-brand-blue hover:underline">← Volver a la tienda</a>
+      </p>
+    </form>
+  </div>
+  <p class="text-center text-white/50 text-xs mt-6">© 2026 CONECTADOS EXPRESS</p>
+</div>
+
+<script type="module">
+  import { supabase } from './js/supabase-client.js';
+
+  // Toggle password visibility
+  document.getElementById('toggle-pw').addEventListener('click', () => {
+    const pw = document.getElementById('password');
+    pw.type = pw.type === 'password' ? 'text' : 'password';
+  });
+
+  // Handle Registration
+  document.getElementById('register-form').addEventListener('submit', async e => {
+    e.preventDefault();
+    const btn = document.getElementById('register-btn');
+    const msgEl = document.getElementById('register-message');
+    
+    btn.textContent = 'Registrando...';
+    btn.disabled = true;
+    msgEl.classList.add('hidden');
+    msgEl.className = 'text-center text-sm hidden'; // reset colors
+
+    let email = e.target.email.value.trim();
+    if (!email.includes('@')) {
+      // Eliminamos espacios internos por si escribieron "Juan Perez"
+      email = email.replace(/\s/g, '') + '@conectados.com';
+    }
+    const password = e.target.password.value;
+
+    const { data, error } = await supabase.auth.signUp({ email, password });
+
+    msgEl.classList.remove('hidden');
+    if (error) {
+      console.error('Supabase Error:', error);
+      if (error.message.includes('Signups not allowed') || error.message.includes('disabled')) {
+        msgEl.textContent = 'Error: El registro por email está desactivado en Supabase (Authentication > Providers).';
+      } else if (error.message.includes('valid') || error.message.includes('format')) {
+        msgEl.textContent = 'Error: Formato de usuario inválido. No uses espacios ni caracteres especiales.';
+      } else if (error.message.includes('rate limit exceeded')) {
+        msgEl.textContent = 'Error: Se ha superado el límite de registros. Por favor, inténtalo de nuevo más tarde (aprox. 1 hora).';
+      } else {
+        msgEl.textContent = 'Error: ' + error.message;
+      }
+      msgEl.classList.add('text-red-600');
+      btn.textContent = 'Registrarse';
+      btn.disabled = false;
+    } else {
+      // signUp fue exitoso, ahora verificamos si se creó una sesión.
+      if (data.session) {
+        // La confirmación por correo está desactivada, el usuario ha iniciado sesión.
+        msgEl.innerHTML = '¡Cuenta creada! <br> Iniciando sesión...';
+        msgEl.classList.add('text-green-600', 'font-medium');
+        setTimeout(() => window.location.href = 'admin.html', 1500);
+      } else {
+        // La confirmación por correo está activada, el usuario debe confirmar.
+        msgEl.innerHTML = '¡Cuenta creada! <br> Por favor, revisa tu correo para activar la cuenta.';
+        msgEl.classList.add('text-green-600', 'font-medium');
+        btn.textContent = 'Registrarse';
+        btn.disabled = false;
+      }
+    }
+  });
+</script>
+</body>
+</html>
