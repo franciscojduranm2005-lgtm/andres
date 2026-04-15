@@ -284,8 +284,10 @@ body {
 }
 @media (max-width: 768px) {
   .hero-btn-wrap {
-    position: static;
-    margin-top: 2rem;
+    position: absolute;
+    bottom: 12px;
+    right: 12px;
+    margin-top: 0;
   }
 }
 
